@@ -3,9 +3,8 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import styles from "./Calendar.module.css";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { Button, Col, Form, Input, Modal, Row, Select } from "antd";
+import { Modal } from "antd";
 import { useState } from "react";
-import { Footer } from "antd/es/layout/layout";
 import CalendarForm from "./CalendarForm";
 moment.locale("pt-br");
 moment.updateLocale("pt-br", {
@@ -42,8 +41,8 @@ moment.defineLocale("pt-br", {
     lastDay: "[Ontem às] LT",
     lastWeek: function () {
       return this.day() === 0 || this.day() === 6
-        ? "[Último] dddd [às] LT" // Saturday + Sunday
-        : "[Última] dddd [às] LT"; // Monday - Friday
+        ? "[Último] dddd [às] LT"
+        : "[Última] dddd [às] LT";
     },
     sameElse: "L",
   },
@@ -68,6 +67,9 @@ moment.defineLocale("pt-br", {
 interface Event {
   start: Date;
   end: Date;
+  title: string;
+  services: string[];
+  customer: string;
 }
 
 export default function SchedulerCalendar() {
@@ -100,8 +102,27 @@ export default function SchedulerCalendar() {
     setIsVisibleModal(false);
   };
 
+  const combineDateAndTime = (date, timeStr) => {
+    if (!timeStr) return null;
+
+    timeStr = timeStr.slice(0, 5);
+
+    const time = moment(timeStr, "HH:mm");
+
+    return moment(date).hour(time.hour()).minute(time.minute()).toDate();
+  };
+
   const handleSubmit = (values) => {
-    console.log("e", values);
+    const newEvent = {
+      title: values.title,
+      services: values.services,
+      customer: values.customer,
+      start: combineDateAndTime(selectedSlot.start, values.startTime),
+      end: combineDateAndTime(selectedSlot.end, values.endTime),
+    };
+
+    setEnvents([...events, newEvent]);
+    setIsVisibleModal(false);
   };
 
   return (
