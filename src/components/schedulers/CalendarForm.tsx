@@ -1,6 +1,7 @@
 import { Button, Col, Form, Input, Row, Select } from "antd";
 import moment from "moment";
 import { useEffect } from "react";
+import InputMask from "../input-mask";
 
 interface Props {
   onSubmitForm: (values: any) => void;
@@ -77,31 +78,19 @@ export default function CalendarForm({
         <Col span={12}>
           <Form.Item
             name={"startTime"}
-            rules={[
-              { required: true, message: "Preencha a hora de início!" },
-              {
-                pattern: /^([01]\d|2[0-3]):([0-5]\d)$/,
-                message: "Formato inválido. Use HH:mm",
-              },
-            ]}
+            rules={[{ required: true, message: "Preencha a hora de início!" }]}
             label="Hora de início"
           >
-            <Input placeholder="HH:mm" />
+            <InputMask mask="99:99" />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
             name={"endTime"}
-            rules={[
-              { required: true, message: "Preencha a estimativa!" },
-              {
-                pattern: /^([01]\d|2[0-3]):([0-5]\d)$/,
-                message: "Formato inválido. Use HH:mm",
-              },
-            ]}
+            rules={[{ required: true, message: "Preencha a estimativa!" }]}
             label="Previsão de término"
           >
-            <Input placeholder="HH:mm" />
+            <InputMask mask="99:99" />
           </Form.Item>
         </Col>
       </Row>
