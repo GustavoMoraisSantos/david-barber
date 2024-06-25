@@ -3,6 +3,10 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import styles from "./Calendar.module.css";
 import moment from "moment";
 import "moment/locale/pt-br";
+import { Button, Col, Form, Input, Modal, Row, Select } from "antd";
+import { useState } from "react";
+import { Footer } from "antd/es/layout/layout";
+import CalendarForm from "./CalendarForm";
 moment.locale("pt-br");
 moment.updateLocale("pt-br", {
   week: {
@@ -61,7 +65,16 @@ moment.defineLocale("pt-br", {
   ordinal: "%dº",
 });
 
+interface Event {
+  start: Date;
+  end: Date;
+}
+
 export default function SchedulerCalendar() {
+  const [isVisibleModal, setIsVisibleModal] = useState(false);
+  const [events, setEnvents] = useState<Event>([]);
+  const [selectedSlot, setSelectedSlot] = useState({ start: null, end: null });
+
   const messages = {
     allDay: "Dia Inteiro",
     previous: "<",
@@ -77,27 +90,52 @@ export default function SchedulerCalendar() {
     showMore: (total: any) => `+ (${total}) Eventos`,
     noEventsInRange: "Nenhum evento encontrado nesse período",
   };
-  const EventsList = [
-    {
-      start: moment("2024-06-23T19:00:00").toDate(),
-      end: moment("2024-06-23T20:00:00").toDate(),
-      title: "Teste ",
-    },
-  ];
+
+  const handleSelectSlot = (slotInfo) => {
+    setSelectedSlot({ start: slotInfo.start, end: slotInfo.end });
+    setIsVisibleModal(true);
+  };
+
+  const handleCancel = () => {
+    setIsVisibleModal(false);
+  };
+
+  const handleSubmit = (values) => {
+    console.log("e", values);
+  };
 
   return (
     <div className={styles.schedulerCalendarContainer}>
       <Calendar
         messages={messages}
         localizer={localizer}
-        events={EventsList}
+        events={events}
         defaultView="week"
+        selectable
+        onSelectSlot={handleSelectSlot}
         culture={"pt-BR"}
         scrollToTime={moment().toDate()}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: "80vh", marginBottom: "3rem" }}
+        style={{ height: "80vh" }}
       />
+
+      <Modal
+        destroyOnClose
+        closable={false}
+        title="Criar agendamento"
+        open={isVisibleModal}
+        footer={null}
+      >
+        <CalendarForm
+          initialValues={{
+            startTime: selectedSlot.start,
+            endTime: selectedSlot.end,
+          }}
+          onSubmitForm={handleSubmit}
+          onCancel={handleCancel}
+        />
+      </Modal>
     </div>
   );
 }
