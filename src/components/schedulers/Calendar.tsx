@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { Calendar, momentLocalizer } from "react-big-calendar";
+import styles from "./Calendar.module.css";
 import moment from "moment";
 import "moment/locale/pt-br";
 moment.locale("pt-br");
@@ -85,7 +86,7 @@ export default function SchedulerCalendar() {
   ];
 
   return (
-    <div>
+    <div className={styles.schedulerCalendarContainer}>
       <Calendar
         messages={messages}
         localizer={localizer}
@@ -95,7 +96,7 @@ export default function SchedulerCalendar() {
         scrollToTime={moment().toDate()}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500 }}
+        style={{ height: "80vh", marginBottom: "3rem" }}
       />
     </div>
   );

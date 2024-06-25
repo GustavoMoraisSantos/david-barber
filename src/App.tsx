@@ -92,6 +92,9 @@ const App: React.FC = () => {
             minHeight: 280,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
           }}
         >
           {selectedTab?.key === "1" && <Dashboard />}
