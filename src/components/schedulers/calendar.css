@@ -1,0 +1,43 @@
+.mainContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedulerCalendarContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rbc-calendar {
+  margin-bottom: 2rem !important;
+  max-height: 78vh;
+}
+
+.rbc-header {
+  background: #17405d;
+  color: whitesmoke;
+  font-size: 14px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px !important;
+}
+
+.rbc-allday-cell {
+  display: none;
+}
+
+.rbc-time-header-cell .rbc-today {
+  background-color: #17405db4 !important;
+}
+
+.rbc-time-content {
+  cursor: pointer;
+}
+
+.rbc-time-slot {
+  color: #8b8b8b;
+  z-index: 1;
+}
