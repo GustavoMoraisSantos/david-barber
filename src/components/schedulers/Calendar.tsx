@@ -1,11 +1,13 @@
 // @ts-nocheck
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "./calendar.css";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { Modal } from "antd";
+import { Button, Modal, Tag } from "antd";
 import { useState } from "react";
 import CalendarForm from "./CalendarForm";
+import { combineDateAndTime } from "../../utils";
+import { VIEW_OPTIONS } from "../../constants";
 moment.locale("pt-br");
 moment.updateLocale("pt-br", {
   week: {
@@ -27,6 +29,7 @@ moment.defineLocale("pt-br", {
     ),
   weekdaysShort: "dom_seg_ter_qua_qui_sex_sáb".split("_"),
   weekdaysMin: "dom_2ª_3ª_4ª_5ª_6ª_sáb".split("_"),
+  // @ts-ignore
   longDateFormat: {
     LT: "HH:mm",
     L: "DD/MM/YYYY",
@@ -40,6 +43,7 @@ moment.defineLocale("pt-br", {
     nextWeek: "dddd [às] LT",
     lastDay: "[Ontem às] LT",
     lastWeek: function () {
+      // @ts-ignore
       return this.day() === 0 || this.day() === 6
         ? "[Último] dddd [às] LT"
         : "[Última] dddd [às] LT";
@@ -61,7 +65,10 @@ moment.defineLocale("pt-br", {
     y: "um ano",
     yy: "%d anos",
   },
-  ordinal: "%dº",
+  // ordinal: "%dº",
+  ordinal: function (number) {
+    return number + "º";
+  },
 });
 
 interface Event {
@@ -74,6 +81,10 @@ interface Event {
 
 export default function SchedulerCalendar() {
   const [isVisibleModal, setIsVisibleModal] = useState(false);
+  const [view, setView] = useState<(typeof Views)[Keys]>(Views.WEEK);
+  const [selectedTag, setSelectedTag] = useState<(typeof Views)[Keys]>(
+    Views.WEEK
+  );
   const [events, setEnvents] = useState<Event>([]);
   const [selectedSlot, setSelectedSlot] = useState({ start: null, end: null });
 
@@ -102,21 +113,11 @@ export default function SchedulerCalendar() {
     setIsVisibleModal(false);
   };
 
-  const combineDateAndTime = (date, timeStr) => {
-    if (!timeStr) return null;
-
-    timeStr = timeStr.slice(0, 5);
-
-    const time = moment(timeStr, "HH:mm");
-
-    return moment(date).hour(time.hour()).minute(time.minute()).toDate();
-  };
-
   const handleSubmit = (values) => {
     const newEvent = {
-      title: values.title,
-      services: values.services,
-      customer: values.customer,
+      title: values?.title,
+      services: values?.services,
+      customer: values?.customer,
       start: combineDateAndTime(selectedSlot.start, values.startTime),
       end: combineDateAndTime(selectedSlot.end, values.endTime),
     };
@@ -125,38 +126,66 @@ export default function SchedulerCalendar() {
     setIsVisibleModal(false);
   };
 
-  return (
-    <div className={"schedulerCalendarContainer"}>
-      <Calendar
-        messages={messages}
-        localizer={localizer}
-        events={events}
-        defaultView="week"
-        selectable
-        onSelectSlot={handleSelectSlot}
-        culture={"pt-BR"}
-        scrollToTime={moment().toDate()}
-        startAccessor="start"
-        endAccessor="end"
-        className={"calendar"}
-      />
+  const handleChangeView = (id: string, checked: boolean) => {
+    setSelectedTag(id);
+    setView(id);
+  };
 
-      <Modal
-        destroyOnClose
-        closable={false}
-        title="Criar agendamento"
-        open={isVisibleModal}
-        footer={null}
-      >
-        <CalendarForm
-          initialValues={{
-            startTime: selectedSlot.start,
-            endTime: selectedSlot.end,
-          }}
-          onSubmitForm={handleSubmit}
-          onCancel={handleCancel}
+  return (
+    <>
+      <div className="customTollbar">
+        {VIEW_OPTIONS.map(({ id, label }) => (
+          <Tag.CheckableTag
+            key={id}
+            checked={selectedTag === id}
+            onChange={(checked) => handleChangeView(id, checked)}
+            style={{
+              borderRadius: "10px",
+              padding: ".3rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              background: `${selectedTag === id ? "#17405dac" : ""}`,
+            }}
+          >
+            {label}
+          </Tag.CheckableTag>
+        ))}
+      </div>
+      <div className={"schedulerCalendarContainer"}>
+        <Calendar
+          messages={messages}
+          localizer={localizer}
+          events={events}
+          defaultView="week"
+          selectable
+          onSelectSlot={handleSelectSlot}
+          culture={"pt-BR"}
+          scrollToTime={moment().toDate()}
+          startAccessor="start"
+          endAccessor="end"
+          className={"calendar"}
+          toolbar={false}
+          view={view}
         />
-      </Modal>
-    </div>
+
+        <Modal
+          destroyOnClose
+          closable={false}
+          title="Criar agendamento"
+          open={isVisibleModal}
+          footer={null}
+        >
+          <CalendarForm
+            initialValues={{
+              startTime: selectedSlot.start,
+              endTime: selectedSlot.end,
+            }}
+            onSubmitForm={handleSubmit}
+            onCancel={handleCancel}
+          />
+        </Modal>
+      </div>
+    </>
   );
 }
