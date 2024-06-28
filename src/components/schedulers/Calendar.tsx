@@ -3,11 +3,12 @@ import { Calendar, Views, momentLocalizer } from "react-big-calendar";
 import "./calendar.css";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { Button, Modal, Tag } from "antd";
-import { useState } from "react";
+import { Button, Modal, Radio, Tag } from "antd";
+import { useCallback, useMemo, useState } from "react";
 import CalendarForm from "./CalendarForm";
 import { combineDateAndTime } from "../../utils";
 import { VIEW_OPTIONS } from "../../constants";
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 moment.locale("pt-br");
 moment.updateLocale("pt-br", {
   week: {
@@ -85,6 +86,7 @@ export default function SchedulerCalendar() {
   const [selectedTag, setSelectedTag] = useState<(typeof Views)[Keys]>(
     Views.WEEK
   );
+  const [date, setDate] = useState(moment());
   const [events, setEnvents] = useState<Event>([]);
   const [selectedSlot, setSelectedSlot] = useState({ start: null, end: null });
 
@@ -131,8 +133,46 @@ export default function SchedulerCalendar() {
     setView(id);
   };
 
+  const onNextClick = useCallback(() => {
+    if (view === Views.DAY) setDate(moment(date).add(1, "d").toDate());
+    if (view === Views.WEEK) setDate(moment(date).add(1, "w").toDate());
+    if (view === Views.MONTH) setDate(moment(date).add(1, "M").toDate());
+  });
+
+  const onPrevClick = useCallback(() => {
+    if (view === Views.DAY) setDate(moment(date).subtract(1, "d").toDate());
+    if (view === Views.WEEK) setDate(moment(date).subtract(1, "w").toDate());
+    if (view === Views.MONTH) setDate(moment(date).subtract(1, "M").toDate());
+  });
+
+  const dateText = useMemo(() => {
+    if (view === Views.DAY) return moment(date).format("dddd, DD - MMMM");
+    if (view === Views.WEEK) {
+      const from = moment(date)?.startOf("week");
+      const to = moment(date)?.endOf("week");
+      return `${from.format("MMMM DD")} até ${to.format("MMMM DD")}`;
+    }
+    if (view === Views.MONTH) return moment(date).format("MMMM YYYY");
+  }, [view, date]);
+
   return (
     <>
+      <div className="dateView">
+        <Radio.Group size="small" onChange={(e) => setSize(e.target.value)}>
+          <Radio.Button onClick={onPrevClick} value="prev">
+            <ArrowLeftOutlined />
+          </Radio.Button>
+          <Radio.Button onClick={() => setDate(moment())} value="default">
+            Hoje
+          </Radio.Button>
+          <Radio.Button onClick={onNextClick} value="next">
+            <ArrowRightOutlined />
+          </Radio.Button>
+        </Radio.Group>
+      </div>
+      <div>
+        <p>{dateText}</p>
+      </div>
       <div className="customTollbar">
         {VIEW_OPTIONS.map(({ id, label }) => (
           <Tag.CheckableTag
@@ -167,6 +207,7 @@ export default function SchedulerCalendar() {
           className={"calendar"}
           toolbar={false}
           view={view}
+          date={date}
         />
 
         <Modal
