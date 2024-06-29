@@ -157,41 +157,43 @@ export default function SchedulerCalendar() {
 
   return (
     <>
-      <div className="dateView">
-        <Radio.Group size="small" onChange={(e) => setSize(e.target.value)}>
-          <Radio.Button onClick={onPrevClick} value="prev">
-            <ArrowLeftOutlined />
-          </Radio.Button>
-          <Radio.Button onClick={() => setDate(moment())} value="default">
-            Hoje
-          </Radio.Button>
-          <Radio.Button onClick={onNextClick} value="next">
-            <ArrowRightOutlined />
-          </Radio.Button>
-        </Radio.Group>
-      </div>
-      <div>
-        <p>{dateText}</p>
-      </div>
-      <div className="customTollbar">
-        {VIEW_OPTIONS.map(({ id, label }) => (
-          <Tag.CheckableTag
-            key={id}
-            checked={selectedTag === id}
-            onChange={(checked) => handleChangeView(id, checked)}
-            style={{
-              borderRadius: "10px",
-              padding: ".3rem",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              background: `${selectedTag === id ? "#17405dac" : ""}`,
-            }}
-          >
-            {label}
-          </Tag.CheckableTag>
-        ))}
-      </div>
+      <header className="tollbar">
+        <div>
+          <Radio.Group size="small" onChange={(e) => setSize(e.target.value)}>
+            <Radio.Button onClick={onPrevClick} value="prev">
+              <ArrowLeftOutlined />
+            </Radio.Button>
+            <Radio.Button onClick={() => setDate(moment())} value="default">
+              Hoje
+            </Radio.Button>
+            <Radio.Button onClick={onNextClick} value="next">
+              <ArrowRightOutlined />
+            </Radio.Button>
+          </Radio.Group>
+        </div>
+        <div>
+          <p className="dateText">{dateText}</p>
+        </div>
+        <div className="customTollbar">
+          {VIEW_OPTIONS.map(({ id, label }) => (
+            <Tag.CheckableTag
+              key={id}
+              checked={selectedTag === id}
+              onChange={(checked) => handleChangeView(id, checked)}
+              style={{
+                borderRadius: "10px",
+                padding: ".3rem",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                background: `${selectedTag === id ? "#17405dac" : ""}`,
+              }}
+            >
+              {label}
+            </Tag.CheckableTag>
+          ))}
+        </div>
+      </header>
       <div className={"schedulerCalendarContainer"}>
         <Calendar
           messages={messages}
