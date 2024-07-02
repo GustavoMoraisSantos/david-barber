@@ -94,7 +94,8 @@ const App: React.FC = () => {
             borderRadius: borderRadiusLG,
             display: "flex",
             flexDirection: "column",
-            overflow: "hidden",
+            flex: "1 1 auto",
+            overflow: "auto",
           }}
         >
           {selectedTab?.key === "1" && <Dashboard />}
